@@ -23,14 +23,14 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Safesquare | Multi-Speciality Mental Health Clinic",
+  title: "Safesquare | Professional Platform for Mental Health Practitioners",
   description:
-    "Safe square is a multi speciality clinic available to all mental health and wellbeing practitioners. Professional mental health services and support.",
+    "Safesquare provides an environment, place, and platform for mental health practitioners to deliver exceptional care to their patients.",
   keywords: [
     "mental health",
-    "clinic",
-    "psychology",
-    "therapy",
+    "practitioners",
+    "clinic space",
+    "therapy platform",
     "wellbeing",
     "Safesquare",
   ],

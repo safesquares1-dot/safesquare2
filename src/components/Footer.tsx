@@ -50,7 +50,7 @@ export default function Footer() {
             </div>
             <div className="w-16 h-1 bg-gradient-to-r from-electric-500 to-neon-500 mb-6" />
             <p className="text-slate-400 mb-8 leading-relaxed">
-              A multi-specialty clinic dedicated to mental health and wellbeing practitioners.
+              A professional platform providing environment, space, and tools for mental health practitioners.
             </p>
             <div className="flex gap-3">
               {[

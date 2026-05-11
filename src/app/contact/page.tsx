@@ -59,7 +59,7 @@ export default function ContactPage() {
             Get in <span className="text-electric-500">Touch</span>
           </h1>
           <p className="text-xl md:text-2xl text-slate-600 max-w-3xl mx-auto font-medium">
-            Have questions or ready to book an appointment? We're here to help.
+            Questions about our practitioner platform or ready to book with one of our professionals? We're here to help.
           </p>
         </div>
       </section>

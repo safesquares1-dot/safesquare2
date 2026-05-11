@@ -123,8 +123,8 @@ export default function Hero() {
             </h1>
 
             <p ref={subtitleRef} className="text-xl md:text-2xl text-slate-600 mb-12 max-w-xl leading-relaxed font-medium">
-              A cutting-edge multi-specialty clinic dedicated to mental health and wellbeing.
-              <span className="text-neon-600 font-bold"> Transform your mind.</span>
+              A professional environment and platform empowering mental health practitioners to deliver exceptional care.
+              <span className="text-neon-600 font-bold"> Your practice, elevated.</span>
             </p>
 
             <div ref={ctaRef} className="flex flex-col sm:flex-row gap-4 mb-16">

@@ -76,10 +76,7 @@ export default function About() {
   }, []);
 
   const timelineItems = [
-    { year: "2015", title: "Foundation", desc: "Safesquare was founded with a mission to provide accessible mental health care." },
-    { year: "2018", title: "Expansion", desc: "Opened our second location and added psychiatric services." },
-    { year: "2020", title: "Innovation", desc: "Launched telehealth platform for remote consultations." },
-    { year: "2023", title: "Recognition", desc: "Awarded 'Best Mental Health Clinic' in the region." },
+    { year: "2022", title: "Digital Wellness Platform", desc: "Launched an integrated digital wellness platform with personalized care plans, connecting patients with practitioners through secure virtual and in-person sessions." },
   ];
 
   const stats = [
@@ -96,23 +93,42 @@ export default function About() {
       <div className="absolute inset-0 grid-pattern opacity-20" />
 
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <div ref={heroRef} className="text-center max-w-3xl mx-auto mb-24">
-          <div className="inline-flex items-center gap-3 px-5 py-3 bg-slate-100 border border-slate-200 rounded-full mb-8 shadow-inner">
+        <div ref={heroRef} className="relative max-w-5xl mx-auto mb-28">
+          {/* Decorative bracket */}
+          <div className="absolute -top-8 -left-4 w-24 h-24 border-t-4 border-l-4 border-electric-500/30 rounded-tl-2xl" />
+          <div className="absolute -bottom-8 -right-4 w-24 h-24 border-b-4 border-r-4 border-neon-500/30 rounded-br-2xl" />
+
+          <div className="inline-flex items-center gap-3 px-5 py-3 bg-slate-100 border border-slate-200 rounded-full mb-10 shadow-inner">
             <div className="w-2 h-2 bg-electric-500 rounded-full" />
             <span className="text-xs font-bold text-slate-600 uppercase tracking-[0.2em]">Our Story</span>
           </div>
 
-          <h2 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold text-slate-900 mb-8 leading-[0.95]">
-            <span className="text-neon-600">Transforming</span>
-            {" "}Mental Health
-            <br />
-            {" "}Through Care
-          </h2>
+          <div className="relative">
+            {/* Large decorative number */}
+            <div className="absolute -top-8 left-0 opacity-10 select-none">
+              <span className="font-display text-[12rem] font-extrabold text-slate-900 leading-none">01</span>
+            </div>
 
-          <div className="w-32 h-1.5 bg-gradient-to-r from-electric-500 via-violet-500 to-neon-500 mx-auto mb-10" />
+            <h2 className="font-display relative text-5xl md:text-6xl lg:text-7xl font-bold text-slate-900 leading-[0.9] pl-24">
+              <span className="hero-word inline-block">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-electric-500 via-violet-500 to-neon-500">Transforming</span>
+              </span>
+              <br />
+              <span className="hero-word inline-block">Mental&nbsp;Health</span>
+              <br />
+              <span className="hero-word inline-block">
+                Through&nbsp;<span className="text-neon-600">Care</span>
+              </span>
+            </h2>
+          </div>
 
-          <p className="text-lg text-slate-600 leading-relaxed font-light">
-            Safesquare is a multi-specialty clinic available to all mental health and wellbeing practitioners. We provide a safe, welcoming environment where individuals can find the support they need.
+          <div className="mt-10 relative">
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-16 h-16 bg-gradient-to-br from-electric-500 to-violet-600 rounded-2xl shadow-sharp rotate-6 opacity-30 blur-xl" />
+            <div className="w-48 h-1.5 bg-gradient-to-r from-electric-500 via-violet-500 to-neon-500 mx-auto relative z-10" />
+          </div>
+
+          <p className="mt-8 max-w-2xl mx-auto text-lg text-slate-600 leading-relaxed font-light">
+            Safesquare provides an environment, a place, and a platform for mental health practitioners to deliver exceptional care to their patients — empowering professionals with the tools, community, and support they need to transform lives.
           </p>
         </div>
 

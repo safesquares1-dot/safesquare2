@@ -76,12 +76,7 @@ export default function AboutPage() {
   ];
 
   const timeline = [
-    { year: "2015", title: "Foundation", description: "Safesquare was founded by Dr. Sarah Chen, a licensed clinical psychologist with 15+ years of experience." },
-    { year: "2017", title: "First Location", description: "Opened our first clinic in downtown Seattle, serving 500+ patients in our first year." },
-    { year: "2019", title: "Expansion", description: "Added three new locations across the Pacific Northwest, doubling our capacity." },
-    { year: "2021", title: "Specialty Services", description: "Launched specialized programs for trauma, addiction, and family therapy." },
-    { year: "2023", title: "Recognition", description: "Awarded 'Best Mental Health Clinic' by Pacific Northwest Healthcare Awards." },
-    { year: "2025", title: "Network", description: "Established practitioner network with 50+ licensed professionals across specialties." },
+    { year: "2022", title: "Digital Wellness Platform", description: "Launched an integrated digital wellness platform with personalized care plans, connecting patients with practitioners through secure virtual and in-person sessions." },
   ];
 
   const testimonials = [
@@ -111,7 +106,7 @@ export default function AboutPage() {
             About <span className="text-electric-500">Safesquare</span>
           </h1>
           <p className="text-xl md:text-2xl text-slate-600 max-w-3xl mx-auto font-medium">
-            Your trusted partner in mental health and wellbeing
+            Empowering practitioners with the environment, space, and platform to deliver exceptional patient care
           </p>
         </div>
       </section>
@@ -134,10 +129,10 @@ export default function AboutPage() {
               </h2>
               <div className="w-24 h-1 bg-gradient-to-r from-electric-500 to-neon-500 mb-8" />
               <p className="text-lg text-slate-600 leading-relaxed mb-6 font-medium">
-                At Safesquare, our mission is to provide accessible, high-quality mental health services to everyone in need. We believe that mental health is just as important as physical health, and we strive to create a safe, welcoming environment where individuals can find the support and care they deserve.
+                At Safesquare, our mission is to empower mental health practitioners by providing a professional environment, dedicated space, and comprehensive platform that enables them to deliver exceptional care to their patients. We believe that when practitioners have the right tools and support, they can focus entirely on what matters most — transforming lives.
               </p>
               <p className="text-lg text-slate-600 leading-relaxed font-medium">
-                As a multi-specialty clinic, we bring together practitioners from various mental health disciplines under one roof. This integrated approach allows us to provide comprehensive care tailored to each individual's unique needs.
+                We bring together practitioners from various mental health disciplines, offering them a collaborative space with administrative support, modern facilities, and a community of peers — all designed to elevate their practice and enhance patient outcomes.
               </p>
             </div>
 

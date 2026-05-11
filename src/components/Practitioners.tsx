@@ -85,7 +85,7 @@ export default function Practitioners() {
           </h2>
           <div className="w-24 h-1 bg-gradient-to-r from-electric-500 to-neon-500 mx-auto mb-8" />
           <p className="text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed font-medium">
-            Safesquare is a multi-specialty clinic available to all mental health and wellbeing practitioners. Join our growing network.
+            Safesquare provides the environment, space, and platform you need to focus on what matters most — your patients.
           </p>
         </div>
 

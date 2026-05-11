@@ -81,7 +81,7 @@ export default function PractitionersPage() {
             Join Our <span className="text-violet-500">Network</span>
           </h1>
           <p className="text-xl md:text-2xl text-slate-600 max-w-3xl mx-auto font-medium">
-            Safesquare is a multi-specialty clinic available to all mental health and wellbeing practitioners.
+            Join a platform designed for practitioners — we provide the environment, space, and support so you can focus on your patients.
           </p>
         </div>
       </section>

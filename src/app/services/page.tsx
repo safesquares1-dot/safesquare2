@@ -72,7 +72,7 @@ export default function ServicesPage() {
             <span className="text-electric-500">Mental Health</span> Services
           </h1>
           <p className="text-xl md:text-2xl text-slate-600 max-w-3xl mx-auto font-medium">
-            Explore our range of mental health and wellbeing services
+            Our practitioners deliver comprehensive mental health services in a professional, supportive environment
           </p>
         </div>
       </section>
