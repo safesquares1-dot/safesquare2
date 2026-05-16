@@ -9,13 +9,13 @@ export default function Home() {
   return (
     <>
       <Hero />
-      <SectionDivider variant="wave" />
+      <SectionDivider variant="wave" label="CH. 02" />
       <About />
       <SectionDivider variant="organic" />
       <Services />
-      <SectionDivider variant="dots" />
+      <SectionDivider variant="wave" label="CH. 04" />
       <Practitioners />
-      <SectionDivider variant="line" />
+      <SectionDivider variant="organic" />
       <Contact />
     </>
   );

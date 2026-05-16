@@ -4,195 +4,261 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Magnetic from "@/components/interactive/Magnetic";
+import { useSpotlight } from "@/components/interactive/useSpotlight";
+import { useImageReveal } from "@/components/interactive/useImageReveal";
 
 gsap.registerPlugin(ScrollTrigger);
 
+const principles = [
+  {
+    n: "i",
+    title: "Environment",
+    body:
+      "Rooms designed to disappear. Natural light, honest materials, and an acoustic stillness that lets the work happen without interruption.",
+  },
+  {
+    n: "ii",
+    title: "Place",
+    body:
+      "A clinic in Clifton, Block 4. Reception that anticipates. Files that are encrypted. A waiting area that does not feel like a waiting area.",
+  },
+  {
+    n: "iii",
+    title: "Platform",
+    body:
+      "Booking, billing, and secure telehealth — operated quietly in the background, so the conversation is the only thing in the room.",
+  },
+];
+
+const stats = [
+  { number: "500+", label: "Patients Served" },
+  { number: "50+", label: "Expert Practitioners" },
+  { number: "15+", label: "Specialities" },
+  { number: "98%", label: "Continued Care" },
+];
+
 export default function About() {
   const sectionRef = useRef<HTMLElement>(null);
-  const heroRef = useRef<HTMLDivElement>(null);
-  const timelineRef = useRef<HTMLDivElement>(null);
-  const statsRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLDivElement>(null);
+  const figureRef = useRef<HTMLDivElement>(null);
+
+  useSpotlight(sectionRef, ".principle-card", { tilt: 3, lift: 8 });
+  useImageReveal(sectionRef);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.fromTo(heroRef.current,
-        { y: 60, opacity: 0 },
-        {
-          y: 0, opacity: 1, duration: 1.2,
-          ease: "power3.out",
-          scrollTrigger: { trigger: heroRef.current, start: "top 80%", once: true },
-        }
-      );
+      const reveals = sectionRef.current?.querySelectorAll(".reveal-up") ?? [];
+      reveals.forEach((el, i) => {
+        gsap.fromTo(
+          el,
+          { y: 32, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.9,
+            ease: "power3.out",
+            delay: (i % 4) * 0.06,
+            scrollTrigger: { trigger: el, start: "top 85%", once: true },
+          }
+        );
+      });
 
-      const timelineItems = timelineRef.current?.children ? Array.from(timelineRef.current.children) : [];
-      gsap.fromTo(timelineItems,
-        { y: 50, opacity: 0, scale: 0.95 },
-        {
-          y: 0, opacity: 1, scale: 1, duration: 0.8, stagger: 0.2,
-          ease: "back.out(1.2)",
-          scrollTrigger: { trigger: timelineRef.current, start: "top 70%", once: true },
-        }
-      );
-
-      gsap.fromTo(imageRef.current,
-        { x: -50, opacity: 0 },
-        {
-          x: 0, opacity: 1, duration: 1,
-          ease: "power3.out",
-          scrollTrigger: { trigger: imageRef.current, start: "top 80%", once: true },
-        }
-      );
-
-      const statEls = statsRef.current?.children ? Array.from(statsRef.current.children) : [];
-      gsap.fromTo(statEls,
-        { y: 40, opacity: 0, scale: 0.9 },
-        {
-          y: 0, opacity: 1, scale: 1, duration: 0.8, stagger: 0.15,
-          ease: "back.out(1.2)",
-          scrollTrigger: { trigger: statsRef.current, start: "top 80%", once: true },
-        }
-      );
-
-      const counters = sectionRef.current ? Array.from(sectionRef.current.querySelectorAll(".counter")) : [];
+      // Stat counters
+      const counters = sectionRef.current?.querySelectorAll(".counter") ?? [];
       counters.forEach((el) => {
         const target = el.getAttribute("data-target") || "0";
-        const numericValue = parseInt(target.replace(/\D/g, ""));
+        const numericValue = parseInt(target.replace(/\D/g, ""), 10);
+        const suffix = target.includes("+") ? "+" : target.includes("%") ? "%" : "";
         const obj = { val: 0 };
         gsap.to(obj, {
           val: numericValue,
-          duration: 2.5,
+          duration: 2.6,
           ease: "power2.out",
-          scrollTrigger: { trigger: el, start: "top 80%", once: true },
+          scrollTrigger: { trigger: el, start: "top 85%", once: true },
           onUpdate: () => {
-            const suffix = target.includes("+") ? "+" : target.includes("%") ? "%" : "";
             el.textContent = Math.floor(obj.val) + suffix;
           },
         });
       });
+
+      // Principle numerals — draw the trailing hairline
+      const numerals = sectionRef.current?.querySelectorAll(".principle-rule") ?? [];
+      numerals.forEach((rule) => {
+        gsap.fromTo(
+          rule,
+          { scaleX: 0 },
+          {
+            scaleX: 1,
+            duration: 1.1,
+            ease: "power4.out",
+            transformOrigin: "left center",
+            scrollTrigger: { trigger: rule, start: "top 85%", once: true },
+          }
+        );
+      });
+
+      // Figure subtle parallax
+      if (figureRef.current) {
+        const img = figureRef.current.querySelector("img");
+        if (img) {
+          gsap.to(img, {
+            yPercent: -8,
+            ease: "none",
+            scrollTrigger: {
+              trigger: figureRef.current,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: 0.8,
+            },
+          });
+        }
+      }
     }, sectionRef);
 
     return () => ctx.revert();
   }, []);
 
-  const timelineItems = [
-    { year: "2022", title: "Digital Wellness Platform", desc: "Launched an integrated digital wellness platform with personalized care plans, connecting patients with practitioners through secure virtual and in-person sessions." },
-  ];
-
-  const stats = [
-    { number: "50+", label: "Expert Practitioners", color: "electric" },
-    { number: "500+", label: "Patients Served", color: "neon" },
-    { number: "15+", label: "Specialities", color: "violet" },
-    { number: "98%", label: "Satisfaction Rate", color: "coral" },
-  ];
-
   return (
-    <section ref={sectionRef} className="relative py-32 bg-white overflow-hidden">
-      <div className="absolute top-0 right-0 w-96 h-96 bg-electric-500/5 blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-neon-500/5 blur-3xl" />
-      <div className="absolute inset-0 grid-pattern opacity-20" />
-
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <div ref={heroRef} className="relative max-w-5xl mx-auto mb-28">
-          {/* Decorative bracket */}
-          <div className="absolute -top-8 -left-4 w-24 h-24 border-t-4 border-l-4 border-electric-500/30 rounded-tl-2xl" />
-          <div className="absolute -bottom-8 -right-4 w-24 h-24 border-b-4 border-r-4 border-neon-500/30 rounded-br-2xl" />
-
-          <div className="inline-flex items-center gap-3 px-5 py-3 bg-slate-100 border border-slate-200 rounded-full mb-10 shadow-inner">
-            <div className="w-2 h-2 bg-electric-500 rounded-full" />
-            <span className="text-xs font-bold text-slate-600 uppercase tracking-[0.2em]">Our Story</span>
+    <section
+      ref={sectionRef}
+      className="relative paper bg-ivory-100 py-28 md:py-36"
+    >
+      <div className="max-w-[1320px] mx-auto px-6 lg:px-12">
+        {/* Spread title */}
+        <div className="grid grid-cols-12 gap-x-6 lg:gap-x-10 mb-20 md:mb-28">
+          <div className="col-span-12 lg:col-span-2 reveal-up">
+            <div className="kicker mb-4">Chapter Two</div>
+            <span className="folio">PG. 24</span>
           </div>
 
-          <div className="relative">
-            {/* Large decorative number */}
-            <div className="absolute -top-8 left-0 opacity-10 select-none">
-              <span className="font-display text-[12rem] font-extrabold text-slate-900 leading-none">01</span>
-            </div>
-
-            <h2 className="font-display relative text-5xl md:text-6xl lg:text-7xl font-bold text-slate-900 leading-[0.9] pl-24">
-              <span className="hero-word inline-block">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-electric-500 via-violet-500 to-neon-500">Transforming</span>
-              </span>
+          <div className="col-span-12 lg:col-span-7">
+            <h2 className="reveal-up font-display text-[3rem] md:text-[4.25rem] lg:text-[5.5rem] font-light text-ink-900 leading-[0.95] tracking-[-0.03em]">
+              On building a clinic
               <br />
-              <span className="hero-word inline-block">Mental&nbsp;Health</span>
+              that <span className="italic text-clay-600">refuses</span> to feel
               <br />
-              <span className="hero-word inline-block">
-                Through&nbsp;<span className="text-neon-600">Care</span>
-              </span>
+              like a clinic.
             </h2>
+
+            <div className="reveal-up h-px bg-ink-900 mt-10 max-w-[120px]" />
           </div>
 
-          <div className="mt-10 relative">
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-16 h-16 bg-gradient-to-br from-electric-500 to-violet-600 rounded-2xl shadow-sharp rotate-6 opacity-30 blur-xl" />
-            <div className="w-48 h-1.5 bg-gradient-to-r from-electric-500 via-violet-500 to-neon-500 mx-auto relative z-10" />
+          <div className="col-span-12 lg:col-span-3 lg:pl-6 lg:border-l lg:border-ink-200 reveal-up">
+            <p className="dropcap text-[1rem] leading-[1.7] text-ink-700 font-light">
+              Safesquare exists to remove every obstacle between practitioner and
+              patient. We carry the room, the calendar, the paperwork, and the
+              quiet — so what happens in the hour is undivided attention.
+            </p>
           </div>
-
-          <p className="mt-8 max-w-2xl mx-auto text-lg text-slate-600 leading-relaxed font-light">
-            Safesquare provides an environment, a place, and a platform for mental health practitioners to deliver exceptional care to their patients — empowering professionals with the tools, community, and support they need to transform lives.
-          </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start mb-32">
-          <div ref={imageRef} className="relative order-2 lg:order-1">
-            <div className="absolute -top-8 -left-8 w-32 h-32 bg-coral-500/20 rounded-full blur-2xl" />
-            <div className="absolute -bottom-8 -right-8 w-40 h-40 bg-violet-500/20 rounded-lg blur-2xl" />
+        {/* Three principles — spotlight cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 border-y border-ink-900">
+          {principles.map((p, i) => (
+            <article
+              key={p.n}
+              className={`principle-card spotlight reveal-up p-8 md:p-10 ${
+                i < principles.length - 1 ? "md:border-r border-ink-200" : ""
+              } ${i > 0 ? "border-t md:border-t-0 border-ink-200" : ""}`}
+              data-cursor="label"
+              data-cursor-text={p.title}
+            >
+              <div className="flex items-baseline gap-4 mb-6">
+                <span className="numeral text-[3.25rem] leading-none text-clay-600">
+                  {p.n}
+                </span>
+                <span className="principle-rule h-px flex-1 bg-ink-300 translate-y-[-0.5rem] origin-left" />
+              </div>
+              <h3 className="font-display text-[1.75rem] font-normal italic leading-[1.05] text-ink-900 mb-4 transition-colors duration-500 group-hover:text-clay-600">
+                {p.title}
+              </h3>
+              <p className="text-[0.95rem] leading-[1.7] text-ink-600 font-light">
+                {p.body}
+              </p>
+            </article>
+          ))}
+        </div>
 
-            <div className="relative aspect-[4/3] bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl shadow-sharp-2xl transform rotate-2">
-              <div className="absolute inset-0 grid-pattern opacity-10" />
+        {/* Editorial figure pair */}
+        <div className="mt-24 grid grid-cols-12 gap-6 lg:gap-10 items-end">
+          <div ref={figureRef} className="col-span-12 lg:col-span-5 reveal-up">
+            <div
+              className="img-reveal img-zoom editorial-image aspect-[4/5] border border-ink-900"
+              data-cursor="view"
+              data-cursor-text="View"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&h=600&fit=crop"
-                alt="Mental health consultation"
-                className="w-full h-full object-cover rounded-3xl opacity-85"
+                src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=700&h=900&fit=crop&q=80"
+                alt="Consulting room"
+                className="w-full h-full object-cover"
               />
+            </div>
+            <div className="mt-4 flex items-start gap-3">
+              <span className="folio mt-1 shrink-0">FIG&nbsp;02</span>
+              <span className="text-[0.78rem] leading-relaxed text-ink-600 font-light">
+                Reading bench. The waiting area that does not feel like one.
+              </span>
             </div>
           </div>
 
-          <div ref={timelineRef} className="order-1 lg:order-2 space-y-8">
-            {timelineItems.map((item, i) => (
-              <div key={item.year} className="relative pl-8">
-                <div className="absolute left-0 top-2 w-4 h-4 bg-electric-500 rounded-full shadow-glow-electric" />
-                <div className={`absolute left-2 top-6 bottom-0 w-0.5 ${
-                  i === timelineItems.length - 1 ? "hidden" : "bg-gradient-to-b from-electric-500 to-neon-500"
-                }`} />
+          <div className="col-span-12 lg:col-span-6 lg:col-start-7 reveal-up">
+            <blockquote className="font-display italic font-light text-[1.7rem] md:text-[2.1rem] lg:text-[2.4rem] leading-[1.15] text-ink-900 tracking-[-0.015em]">
+              <span className="text-clay-600">&ldquo;</span>
+              We started Safesquare to give practitioners the only resource that
+              cannot be bought — undisturbed hours with the people who came to be
+              heard.
+              <span className="text-clay-600">&rdquo;</span>
+            </blockquote>
+            <div className="mt-8 flex items-center gap-4">
+              <span className="h-px w-10 bg-clay-600" />
+              <div>
+                <div className="font-mono text-[0.7rem] tracking-[0.22em] uppercase text-ink-900">
+                  Founding Note
+                </div>
+                <div className="text-[0.78rem] text-ink-500 mt-1">
+                  Karachi · 2012
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                <div className="bg-white border-2 border-slate-200 rounded-xl p-6 shadow-sharp hover:shadow-sharp-lg transition-all duration-300">
-                  <div className="text-xs font-bold text-electric-600 uppercase tracking-wider mb-2">{item.year}</div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">{item.title}</h3>
-                  <p className="text-slate-600 font-light">{item.desc}</p>
+        {/* Stats — hoverable figures */}
+        <div className="mt-28 border-t border-ink-900 pt-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-y-10 md:gap-x-8">
+            {stats.map((s) => (
+              <div key={s.label} className="reveal-up group">
+                <div
+                  className="counter numeral text-[3.25rem] md:text-[4rem] tabular-nums transition-colors duration-500 group-hover:text-clay-600"
+                  data-target={s.number}
+                >
+                  0
+                </div>
+                <div className="mt-3 flex items-center gap-2">
+                  <span className="h-px w-5 bg-clay-600 group-hover:w-12 transition-[width] duration-500 ease-[var(--ease-editorial)]" />
+                  <span className="font-mono text-[0.68rem] tracking-[0.22em] uppercase text-ink-500">
+                    {s.label}
+                  </span>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-16 border-t-2 border-slate-200">
-          {stats.map((stat) => (
-            <div
-              key={stat.label}
-              className={`pl-6 relative ${
-                stat.color === "electric" ? "border-l-2 border-electric-500" :
-                stat.color === "neon" ? "border-l-2 border-neon-500" :
-                stat.color === "violet" ? "border-l-2 border-violet-500" :
-                "border-l-2 border-coral-500"
-              }`}
-            >
-              <div className="counter text-4xl md:text-5xl font-bold text-slate-900 font-display leading-none" data-target={stat.number}>0</div>
-              <div className="text-xs text-slate-500 font-semibold uppercase tracking-wide mt-2">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="text-center mt-24">
-          <Link
-            href="/about"
-            className="group relative px-10 py-5 bg-slate-900 text-white font-bold rounded-lg shadow-sharp hover:shadow-sharp-xl transition-all duration-300 hover:-translate-y-1 inline-flex items-center gap-4 overflow-hidden"
-          >
-            <span className="relative z-10 flex items-center gap-3">
-              Discover Our Mission
-              <span className="w-10 h-0.5 bg-white transform origin-left group-hover:scale-x-100 transition-transform duration-300" />
-            </span>
-            <div className="absolute inset-0 bg-gradient-to-r from-electric-600 to-violet-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          </Link>
+        {/* CTA */}
+        <div className="reveal-up mt-24 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pt-10 border-t border-ink-900">
+          <p className="font-display italic text-[1.6rem] md:text-[2rem] font-light text-ink-900 max-w-[28ch] leading-tight">
+            Read on for the practice in full —
+          </p>
+          <Magnetic strength={0.35}>
+            <Link href="/about" className="btn-ink" data-cursor="label" data-cursor-text="Read →">
+              Our Mission
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="miter" strokeWidth={1.5} d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </Link>
+          </Magnetic>
         </div>
       </div>
     </section>

@@ -5,291 +5,374 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Magnetic from "@/components/interactive/Magnetic";
+import { useSpotlight } from "@/components/interactive/useSpotlight";
 
 gsap.registerPlugin(ScrollTrigger);
 
+const timelineItems = [
+  { year: "2012", title: "The Idea", description: "A handful of clinicians, frustrated by the friction between practice and care, write a five-page brief on what a quieter clinic would do differently." },
+  { year: "2015", title: "First Suite Opens", description: "Two consulting rooms in Clifton. North light, hardwood floors, no waiting-room television. We open with three practitioners and a small caseload." },
+  { year: "2018", title: "Practice Operations", description: "The intake desk launches — booking, billing, follow-up, written correspondence. Practitioners stop carrying the clinic and start carrying the conversation." },
+  { year: "2020", title: "Encrypted Telehealth", description: "Secure video consultation is added to every practice. Records remain on-shore. The pandemic does not become the reason for cutting corners." },
+  { year: "2022", title: "The Platform", description: "Safesquare opens to associate practitioners on a single-fee model. Care plans, supervision groups, and peer consultation become part of the membership." },
+  { year: "2024", title: "Fifty Practitioners", description: "We pass fifty practitioners and five hundred patients served. We stop counting milestones publicly and return to counting hours." },
+];
+
+const certifications = [
+  { abbr: "HPA", title: "HIPAA-aligned", desc: "Privacy protocols audited annually by an independent reviewer." },
+  { abbr: "PCS", title: "Pakistan Clinical Standards", desc: "Operating under the standards published by the national board." },
+  { abbr: "LIC", title: "Fully Licensed", desc: "Every practitioner registered with their respective licensing body." },
+  { abbr: "QA", title: "Quality Assured", desc: "Quarterly internal review of outcomes, attendance, and complaints." },
+];
+
+const testimonials = [
+  {
+    quote: "Safesquare transformed my practice. I had spent ten years answering my own phone. Now I answer my patients.",
+    author: "Dr. Sarah Mitchell",
+    role: "Clinical Psychologist · Member since 2018",
+  },
+  {
+    quote: "The peer consultation group is the most professionally useful hour of my month. Quiet, rigorous, kind.",
+    author: "Dr. James Carter",
+    role: "Consultant Psychiatrist",
+  },
+  {
+    quote: "Administrative load went from forty percent of my week to under five. I have never been less busy and more effective.",
+    author: "Dr. Emily Chen",
+    role: "Licensed Therapist",
+  },
+];
+
 export default function AboutPage() {
-  const heroRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const timelineRef = useRef<HTMLDivElement>(null);
-  const certificationsRef = useRef<HTMLDivElement>(null);
-  const testimonialsRef = useRef<HTMLDivElement>(null);
+  const pageRef = useRef<HTMLElement>(null);
+
+  useSpotlight(pageRef, ".vision-card", { tilt: 2, lift: 6 });
+  useSpotlight(pageRef, ".cert-card", { tilt: 3, lift: 8 });
+  useSpotlight(pageRef, ".testimonial-card", { tilt: 2, lift: 6 });
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Hero animation
-      const heroEls = heroRef.current?.children ? Array.from(heroRef.current.children) : [];
-      gsap.fromTo(heroEls,
-        { y: 50, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, stagger: 0.15, ease: "power3.out" }
+      // Hero headline curtain
+      const lines = pageRef.current?.querySelectorAll(".hero-line .hero-inner") ?? [];
+      gsap.fromTo(
+        lines,
+        { y: "108%" },
+        { y: "0%", duration: 1.05, ease: "power4.out", stagger: 0.12 }
       );
 
-      // Content sections
-      const contentEls = contentRef.current?.children ? Array.from(contentRef.current.children) : [];
-      gsap.fromTo(contentEls,
-        { y: 60, opacity: 0 },
-        {
-          y: 0, opacity: 1, duration: 0.8, stagger: 0.2, ease: "power3.out",
-          scrollTrigger: { trigger: contentRef.current, start: "top 75%", once: true },
-        }
-      );
+      const reveals = pageRef.current?.querySelectorAll(".reveal-up") ?? [];
+      reveals.forEach((el, i) => {
+        gsap.fromTo(
+          el,
+          { y: 32, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.85,
+            ease: "power3.out",
+            delay: (i % 3) * 0.06,
+            scrollTrigger: { trigger: el, start: "top 88%", once: true },
+          }
+        );
+      });
 
-      // Timeline items
-      const timelineItems = timelineRef.current?.querySelectorAll(".timeline-item") ?? [];
-      gsap.fromTo(timelineItems,
-        { x: -50, opacity: 0 },
-        {
-          x: 0, opacity: 1, duration: 0.7, stagger: 0.15, ease: "power3.out",
-          scrollTrigger: { trigger: timelineRef.current, start: "top 75%", once: true },
-        }
-      );
+      // Timeline rows — animated entrance + hover effect
+      const rows = pageRef.current?.querySelectorAll<HTMLElement>(".timeline-row") ?? [];
+      const cleanups: Array<() => void> = [];
 
-      // Certifications
-      const certCards = certificationsRef.current?.querySelectorAll(".cert-card") ?? [];
-      gsap.fromTo(certCards,
-        { y: 40, opacity: 0, scale: 0.95 },
-        {
-          y: 0, opacity: 1, scale: 1, duration: 0.6, stagger: 0.1, ease: "back.out(1.2)",
-          scrollTrigger: { trigger: certificationsRef.current, start: "top 75%", once: true },
-        }
-      );
+      rows.forEach((row) => {
+        const fill = row.querySelector(".timeline-fill");
+        const year = row.querySelector(".timeline-year");
+        const title = row.querySelector(".timeline-title");
 
-      // Testimonials
-      const testimonialCards = testimonialsRef.current?.querySelectorAll(".testimonial-card") ?? [];
-      gsap.fromTo(testimonialCards,
-        { y: 50, opacity: 0 },
-        {
-          y: 0, opacity: 1, duration: 0.7, stagger: 0.15, ease: "power3.out",
-          scrollTrigger: { trigger: testimonialsRef.current, start: "top 75%", once: true },
-        }
-      );
-    });
+        gsap.set(fill, { scaleX: 0, transformOrigin: "left center" });
 
+        const enter = () => {
+          gsap.to(fill, { scaleX: 1, duration: 0.6, ease: "power3.out" });
+          gsap.to(year, { x: 6, duration: 0.45, ease: "power3.out" });
+          gsap.to(title, { x: 8, color: "#B8512E", duration: 0.45, ease: "power3.out" });
+        };
+        const leave = () => {
+          gsap.to(fill, {
+            scaleX: 0,
+            duration: 0.5,
+            ease: "power3.in",
+            transformOrigin: "right center",
+            onComplete: () => gsap.set(fill, { transformOrigin: "left center" }),
+          });
+          gsap.to(year, { x: 0, duration: 0.45, ease: "power3.out" });
+          gsap.to(title, { x: 0, color: "#0F0E0C", duration: 0.45, ease: "power3.out" });
+        };
+
+        row.addEventListener("pointerenter", enter);
+        row.addEventListener("pointerleave", leave);
+        cleanups.push(() => {
+          row.removeEventListener("pointerenter", enter);
+          row.removeEventListener("pointerleave", leave);
+        });
+      });
+
+      return () => cleanups.forEach((fn) => fn());
+    }, pageRef);
     return () => ctx.revert();
   }, []);
 
-  const values = [
-    { title: "Compassion", description: "We treat every individual with empathy, understanding, and genuine care.", color: "electric" },
-    { title: "Excellence", description: "We maintain the highest standards in mental health practice and service delivery.", color: "neon" },
-    { title: "Integrity", description: "We operate with honesty, transparency, and ethical practices in all we do.", color: "violet" },
-    { title: "Innovation", description: "We embrace new approaches and technologies to improve mental health outcomes.", color: "coral" },
-  ];
-
-  const timeline = [
-    { year: "2022", title: "Digital Wellness Platform", description: "Launched an integrated digital wellness platform with personalized care plans, connecting patients with practitioners through secure virtual and in-person sessions." },
-  ];
-
-  const testimonials = [
-    { name: "Michael Rodriguez", role: "Patient since 2019", content: "Safesquare transformed my life. The practitioners truly understand and tailor their approach to each individual. I've been sober for 3 years thanks to their guidance.", rating: 5 },
-    { name: "Jennifer Walsh", role: "Parent", content: "Our daughter's anxiety struggles have significantly improved since starting therapy here. The family sessions were invaluable for understanding and supporting her journey.", rating: 5 },
-    { name: "Dr. Amanda Foster", role: "Clinical Psychologist", content: "As both a patient and colleague, I appreciate the integrative approach. Safesquare's commitment to evidence-based practice while maintaining compassion is exceptional.", rating: 5 },
-  ];
-
-  const colorClasses: Record<string, { bg: string; border: string; icon: string }> = {
-    electric: { bg: "bg-electric-50", border: "border-electric-500", icon: "bg-electric-500" },
-    neon: { bg: "bg-neon-50", border: "border-neon-500", icon: "bg-neon-500" },
-    violet: { bg: "bg-violet-50", border: "border-violet-500", icon: "bg-violet-500" },
-    coral: { bg: "bg-coral-50", border: "border-coral-500", icon: "bg-coral-500" },
-  };
-
   return (
-    <>
-      {/* Hero Section */}
-      <section className="pt-40 pb-20 bg-white relative overflow-hidden">
-        <div className="absolute inset-0 grid-pattern opacity-30" />
-        <div className="absolute top-20 right-20 w-72 h-72 bg-electric-500/10 rounded-full blur-3xl" />
-        <div ref={heroRef} className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-900 rounded-full mb-6 shadow-sharp">
-            <span className="text-sm font-bold text-slate-900 uppercase tracking-wider">About Us</span>
-          </div>
-          <h1 className="font-display text-6xl md:text-7xl lg:text-8xl font-bold text-slate-900 mb-6 leading-[0.9]">
-            About <span className="text-electric-500">Safesquare</span>
-          </h1>
-          <p className="text-xl md:text-2xl text-slate-600 max-w-3xl mx-auto font-medium">
-            Empowering practitioners with the environment, space, and platform to deliver exceptional patient care
-          </p>
-        </div>
-      </section>
-
-      {/* About Component */}
-      <About />
-
-      {/* Mission & Values */}
-      <section className="py-32 bg-slate-50 relative overflow-hidden">
-        <div className="absolute inset-0 stripe-pattern opacity-20" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-neon-500/5 blur-3xl" />
-        <div ref={contentRef} className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto">
-            <div className="mb-20">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-900 rounded-full mb-6 shadow-sharp">
-                <span className="text-sm font-bold text-slate-900 uppercase tracking-wider">Our Mission</span>
-              </div>
-              <h2 className="font-display text-4xl md:text-5xl font-bold text-slate-900 mb-6">
-                Accessible, High-Quality <span className="text-neon-500">Mental Health</span>
-              </h2>
-              <div className="w-24 h-1 bg-gradient-to-r from-electric-500 to-neon-500 mb-8" />
-              <p className="text-lg text-slate-600 leading-relaxed mb-6 font-medium">
-                At Safesquare, our mission is to empower mental health practitioners by providing a professional environment, dedicated space, and comprehensive platform that enables them to deliver exceptional care to their patients. We believe that when practitioners have the right tools and support, they can focus entirely on what matters most — transforming lives.
-              </p>
-              <p className="text-lg text-slate-600 leading-relaxed font-medium">
-                We bring together practitioners from various mental health disciplines, offering them a collaborative space with administrative support, modern facilities, and a community of peers — all designed to elevate their practice and enhance patient outcomes.
-              </p>
+    <main ref={pageRef} className="min-h-screen">
+      {/* HERO */}
+      <section className="paper bg-ivory-100 pt-16 pb-24">
+        <div className="max-w-[1320px] mx-auto px-6 lg:px-12">
+          <div className="grid grid-cols-12 gap-x-6 lg:gap-x-10 items-center pb-6 border-b border-ink-900">
+            <div className="col-span-6 lg:col-span-3 flex items-center gap-3">
+              <span className="folio">№ 002</span>
+              <span className="h-px w-8 bg-ink-900" />
+              <span className="folio">On Origins</span>
             </div>
+            <div className="hidden lg:flex col-span-6 justify-center"><span className="folio">CHAPTER · TWO · OF · FIVE</span></div>
+            <div className="col-span-6 lg:col-span-3 flex justify-end items-center gap-3">
+              <span className="folio">EST. 2012</span>
+              <span className="h-px w-8 bg-ink-900" />
+              <span className="folio">PG. 12</span>
+            </div>
+          </div>
 
-            <div>
-              <h2 className="font-display text-4xl md:text-5xl font-bold text-slate-900 mb-12">Our Values</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {values.map((value) => {
-                  const colors = colorClasses[value.color];
-                  return (
-                    <div key={value.title} className={`group bg-white p-8 rounded-2xl border-2 border-slate-200 hover:border-slate-900 hover-lift transition-all duration-300`}>
-                      <div className={`absolute top-0 left-0 right-0 h-1 ${colors.icon} scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left rounded-t-2xl`} />
-                      <h3 className="text-2xl font-bold text-slate-900 mb-3">
-                        {value.title}
-                      </h3>
-                      <p className="text-slate-600 leading-relaxed font-medium">{value.description}</p>
-                    </div>
-                  );
-                })}
-              </div>
+          <div className="grid grid-cols-12 gap-x-6 lg:gap-x-10 pt-16">
+            <div className="col-span-12 lg:col-span-2">
+              <div className="kicker mb-4">About</div>
+            </div>
+            <div className="col-span-12 lg:col-span-10">
+              <h1 className="font-display text-[3.4rem] sm:text-[4.5rem] md:text-[5.5rem] lg:text-[7rem] font-light text-ink-900 leading-[0.92] tracking-[-0.035em]">
+                <span className="hero-line block overflow-hidden"><span className="hero-inner block">A clinic written</span></span>
+                <span className="hero-line block overflow-hidden"><span className="hero-inner block">in the <span className="italic text-clay-600">margins</span></span></span>
+                <span className="hero-line block overflow-hidden"><span className="hero-inner block">of a notebook,</span></span>
+                <span className="hero-line block overflow-hidden"><span className="hero-inner block italic">in 2012.</span></span>
+              </h1>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-12 gap-x-6 lg:gap-x-10 mt-16">
+            <div className="col-span-12 lg:col-span-7 lg:col-start-3 reveal-up">
+              <p className="dropcap text-[1.1rem] leading-[1.75] text-ink-700 font-light max-w-[64ch]">
+                Safesquare began as a five-page brief, passed between three
+                practitioners, listing every operational tax that had nothing to do
+                with the work — the receptionist who took messages but didn&apos;t
+                book, the billing that arrived eight weeks late, the room booked
+                over an existing patient. We crossed each item off, one at a time,
+                until what remained was the practice itself.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Timeline */}
-      <section className="py-32 bg-white relative overflow-hidden">
-        <div className="absolute inset-0 grid-pattern-dense opacity-20" />
-        <div className="absolute top-20 left-20 w-80 h-80 bg-violet-500/5 blur-3xl" />
-        <div ref={timelineRef} className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-20">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-900 rounded-full mb-6 shadow-sharp">
-                <span className="text-sm font-bold text-slate-900 uppercase tracking-wider">Our Journey</span>
-              </div>
-              <h2 className="font-display text-4xl md:text-5xl font-bold text-slate-900 mb-6">
-                Clinic <span className="text-violet-500">Timeline</span>
+      {/* MISSION + VISION */}
+      <section className="paper bg-ivory-50 py-24 md:py-32 border-y border-ink-900">
+        <div className="max-w-[1320px] mx-auto px-6 lg:px-12">
+          <div className="grid grid-cols-12 gap-x-6 lg:gap-x-10 mb-16">
+            <div className="col-span-12 lg:col-span-2 reveal-up"><div className="kicker mb-4">Position</div><span className="folio">PG. 14</span></div>
+            <div className="col-span-12 lg:col-span-8 reveal-up">
+              <h2 className="font-display text-[2.5rem] md:text-[3.5rem] lg:text-[4.5rem] font-light text-ink-900 leading-[0.95] tracking-[-0.03em]">
+                Two statements,
+                <br />
+                <span className="italic text-clay-600">re-read often.</span>
               </h2>
-              <p className="text-lg text-slate-600 max-w-2xl mx-auto font-medium">
-                Ten years of dedicated service, continuous growth, and unwavering commitment to mental health excellence.
-              </p>
             </div>
+          </div>
 
-            <div className="relative">
-              <div className="absolute left-8 top-0 bottom-0 w-1 bg-gradient-to-b from-electric-500 via-neon-500 to-violet-500" />
-              <div className="space-y-12">
-                {timeline.map((item, i) => (
-                  <div key={item.year} className="timeline-item relative flex items-start">
-                    <div className="absolute left-8 -translate-x-1/2 w-10 h-10 bg-white border-4 border-electric-500 rounded-full shadow-sharp z-10 flex items-center justify-center">
-                      <div className="w-3 h-3 bg-electric-500 rounded-full" />
-                    </div>
-                    <div className="ml-20 bg-white p-8 rounded-2xl border-2 border-slate-200 hover:border-slate-900 shadow-sharp hover:shadow-sharp-lg hover:-translate-y-1 transition-all duration-300 flex-1">
-                      <div className="flex items-center gap-4 mb-4">
-                        <span className="text-electric-600 font-bold font-display text-2xl">{item.year}</span>
-                        <div className="h-1 bg-gradient-to-r from-electric-500 to-transparent flex-1 rounded-full" />
-                      </div>
-                      <h3 className="font-bold text-slate-900 text-xl mb-2">{item.title}</h3>
-                      <p className="text-slate-600 leading-relaxed font-medium">{item.description}</p>
-                    </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 border-t border-ink-900">
+            <article
+              className="vision-card spotlight reveal-up p-10 md:p-14 border-b lg:border-b-0 lg:border-r border-ink-200"
+              data-cursor="label"
+              data-cursor-text="Vision"
+            >
+              <div className="flex items-baseline gap-4 mb-6">
+                <span className="numeral text-[3.5rem] leading-none text-clay-600">i</span>
+                <span className="folio">OUR VISION</span>
+              </div>
+              <p className="font-display italic font-light text-[1.5rem] md:text-[1.85rem] leading-[1.25] text-ink-900 tracking-[-0.015em]">
+                A profession where the conversation between practitioner and patient
+                is the only thing competing for attention.
+              </p>
+              <p className="mt-8 text-[0.95rem] leading-[1.7] text-ink-700 font-light">
+                We work towards a clinical environment in which every operational
+                obstacle — booking, billing, paperwork, premises — has been
+                quietly handled. The hour belongs to the work.
+              </p>
+            </article>
+
+            <article
+              className="vision-card spotlight reveal-up p-10 md:p-14"
+              data-cursor="label"
+              data-cursor-text="Mission"
+            >
+              <div className="flex items-baseline gap-4 mb-6">
+                <span className="numeral text-[3.5rem] leading-none text-clay-600">ii</span>
+                <span className="folio">OUR MISSION</span>
+              </div>
+              <p className="font-display italic font-light text-[1.5rem] md:text-[1.85rem] leading-[1.25] text-ink-900 tracking-[-0.015em]">
+                To provide the environment, the place, and the platform — so that
+                clinicians can carry only the conversation.
+              </p>
+              <p className="mt-8 text-[0.95rem] leading-[1.7] text-ink-700 font-light">
+                We build the spaces, run the operations, and hold the standards so
+                that mental-health practitioners can deliver care without compromise
+                and without burnout.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      {/* TIMELINE */}
+      <section className="paper bg-ivory-100 py-24 md:py-36">
+        <div className="max-w-[1320px] mx-auto px-6 lg:px-12">
+          <div className="reveal-up mb-16">
+            <div className="kicker mb-4">A Brief Chronology</div>
+            <h2 className="font-display text-[2.5rem] md:text-[4rem] font-light text-ink-900 leading-[0.95] tracking-[-0.03em]">
+              <span className="italic">Twelve years,</span>
+              <br />
+              briefly noted.
+            </h2>
+          </div>
+
+          <ol className="border-t border-ink-900">
+            {timelineItems.map((item) => (
+              <li
+                key={item.year}
+                className="reveal-up border-b border-ink-200 group"
+              >
+                <div
+                  className="timeline-row relative grid grid-cols-12 gap-x-4 lg:gap-x-8 py-8 md:py-10 items-baseline"
+                  data-cursor="label"
+                  data-cursor-text={item.year}
+                >
+                  <span
+                    aria-hidden
+                    className="timeline-fill absolute inset-0 bg-clay-100/60 -z-0"
+                  />
+                  <div className="col-span-3 md:col-span-2 relative z-10">
+                    <span className="timeline-year inline-block numeral text-[2rem] md:text-[3rem] tabular-nums text-clay-600">
+                      {item.year}
+                    </span>
                   </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Certifications */}
-      <section className="py-32 bg-slate-50 relative overflow-hidden">
-        <div className="absolute inset-0 grid-pattern opacity-20" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-coral-500/5 blur-3xl" />
-        <div ref={certificationsRef} className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-20">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-900 rounded-full mb-6 shadow-sharp">
-                <span className="text-sm font-bold text-slate-900 uppercase tracking-wider">Standards & Ethics</span>
-              </div>
-              <h2 className="font-display text-4xl md:text-5xl font-bold text-slate-900 mb-6">
-                Certifications & <span className="text-coral-500">Accreditations</span>
-              </h2>
-              <p className="text-lg text-slate-600 max-w-2xl mx-auto font-medium">
-                Our commitment to excellence is validated by recognized professional standards and ongoing education requirements.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[
-                { name: "Joint Commission", desc: "Accredited healthcare facility meeting national quality and safety standards", icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z", color: "electric" },
-                { name: "State Licensed", desc: "All practitioners licensed and in good standing with state boards", icon: "M9 12l2 2 4-4m6-2a9 9 0 11-18 0 9 9 0 0118 0z", color: "neon" },
-                { name: "HIPAA Compliant", desc: "Strict adherence to patient privacy and data protection regulations", icon: "M12 15v2m-6 4h12a2 2 0 002-2v-2a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2z", color: "violet" },
-                { name: "Evidence-Based", desc: "Treatment methods grounded in peer-reviewed research and clinical evidence", icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2", color: "coral" },
-                { name: "Continuing Education", desc: "Practitioners complete 40+ hours of CE annually", icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253", color: "electric" },
-                { name: "Ethics Pledge", desc: "Annual commitment to professional ethics and client welfare", icon: "M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z", color: "neon" },
-              ].map((cert) => {
-                const colors = colorClasses[cert.color];
-                return (
-                  <div key={cert.name} className={`cert-card group bg-white p-6 rounded-2xl border-2 border-slate-200 hover:border-slate-900 hover-lift transition-all duration-300`}>
-                    <div className={`absolute top-0 left-0 right-0 h-1 ${colors.icon} scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left rounded-t-2xl`} />
-                    <div className={`w-14 h-14 ${colors.icon} text-white rounded-xl flex items-center justify-center mb-4 shadow-sharp group-hover:shadow-sharp-lg group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
-                      <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={cert.icon} />
-                      </svg>
-                    </div>
-                    <h3 className="font-bold text-slate-900 mb-2">{cert.name}</h3>
-                    <p className="text-slate-600 text-sm leading-relaxed font-medium">{cert.desc}</p>
+                  <div className="col-span-9 md:col-span-4 relative z-10">
+                    <h3 className="timeline-title font-display italic text-[1.5rem] md:text-[1.85rem] font-light text-ink-900 leading-tight">
+                      {item.title}
+                    </h3>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-32 bg-slate-900 relative overflow-hidden">
-        <div className="absolute inset-0 grid-pattern opacity-5" />
-        <div className="absolute top-0 right-0 w-96 h-96 bg-electric-500/10 blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-neon-500/10 blur-3xl" />
-        <div ref={testimonialsRef} className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-20">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm border-2 border-white/20 rounded-full mb-6">
-                <span className="text-sm font-bold text-white uppercase tracking-wider">Stories</span>
-              </div>
-              <h2 className="font-display text-4xl md:text-5xl font-bold text-white mb-6">
-                Client <span className="text-neon-400">Stories</span>
-              </h2>
-              <p className="text-lg text-slate-300 max-w-2xl mx-auto font-medium">
-                Real experiences from individuals who found healing and growth at Safesquare.
-              </p>
-            </div>
-
-            <div className="space-y-6">
-              {testimonials.map((testimonial, i) => (
-                <div key={testimonial.name} className="testimonial-card bg-white/5 backdrop-blur-sm p-8 rounded-2xl border-2 border-white/10 hover:border-white/30 hover:bg-white/10 transition-all duration-300">
-                  <div className="flex items-center gap-1 mb-4">
-                    {[...Array(testimonial.rating)].map((_, j) => (
-                      <svg key={j} className="w-5 h-5 text-neon-400 fill-current" viewBox="0 0 24 24">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                      </svg>
-                    ))}
-                  </div>
-                  <p className="text-lg text-white/90 leading-relaxed mb-6 font-medium italic">"{testimonial.content}"</p>
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-electric-500 to-violet-600 rounded-full flex items-center justify-center shadow-sharp">
-                      <span className="text-white font-bold text-lg">{testimonial.name.charAt(0)}</span>
-                    </div>
-                    <div>
-                      <span className="text-white font-bold block">{testimonial.name}</span>
-                      <span className="text-slate-400 text-sm">{testimonial.role}</span>
-                    </div>
+                  <div className="col-span-12 md:col-span-6 mt-3 md:mt-0 relative z-10">
+                    <p className="text-[0.95rem] leading-[1.7] text-ink-700 font-light max-w-[54ch]">
+                      {item.description}
+                    </p>
                   </div>
                 </div>
-              ))}
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* CERTIFICATIONS */}
+      <section className="paper bg-ivory-50 py-24 md:py-32 border-y border-ink-900">
+        <div className="max-w-[1320px] mx-auto px-6 lg:px-12">
+          <div className="reveal-up mb-16 grid grid-cols-12 gap-x-6 lg:gap-x-10">
+            <div className="col-span-12 lg:col-span-7">
+              <div className="kicker mb-4">Standards</div>
+              <h2 className="font-display text-[2.5rem] md:text-[4rem] font-light text-ink-900 leading-[0.95] tracking-[-0.03em]">
+                What we&apos;ve agreed
+                <br />
+                <span className="italic text-clay-600">to be held to.</span>
+              </h2>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 border-y border-ink-900">
+            {certifications.map((cert, i) => (
+              <div
+                key={cert.title}
+                data-cursor="label"
+                data-cursor-text={cert.abbr}
+                className={`cert-card spotlight reveal-up p-8 md:p-10 ${
+                  i < certifications.length - 1 ? "md:border-r border-ink-200" : ""
+                } ${i > 0 && i % 2 === 0 ? "md:border-t lg:border-t-0 border-ink-200" : ""}`}
+              >
+                <div className="inline-flex items-center justify-center w-14 h-14 border border-ink-900 font-mono text-[0.7rem] tracking-[0.18em] uppercase mb-6">
+                  {cert.abbr}
+                </div>
+                <h3 className="font-display italic text-[1.5rem] font-light text-ink-900 mb-3 leading-tight">
+                  {cert.title}
+                </h3>
+                <p className="text-[0.9rem] leading-[1.65] text-ink-600 font-light">
+                  {cert.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* TESTIMONIALS */}
+      <section className="paper bg-ivory-100 py-24 md:py-36">
+        <div className="max-w-[1320px] mx-auto px-6 lg:px-12">
+          <div className="reveal-up mb-16">
+            <div className="kicker mb-4">Voices from the Practice</div>
+            <h2 className="font-display text-[2.5rem] md:text-[4rem] font-light text-ink-900 leading-[0.95] tracking-[-0.03em]">
+              <span className="italic">In their own</span> words.
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-ink-200 border border-ink-200">
+            {testimonials.map((t) => (
+              <figure
+                key={t.author}
+                data-cursor="label"
+                data-cursor-text="Voice"
+                className="testimonial-card spotlight reveal-up bg-ivory-50 p-10 md:p-12 flex flex-col"
+              >
+                <span className="font-display italic text-[3rem] leading-none text-clay-600 mb-6">
+                  &ldquo;
+                </span>
+                <blockquote className="font-display italic font-light text-[1.25rem] leading-[1.45] text-ink-900 flex-1">
+                  {t.quote}
+                </blockquote>
+                <figcaption className="mt-8 pt-6 border-t border-ink-200">
+                  <div className="font-medium text-[0.95rem] text-ink-900">{t.author}</div>
+                  <div className="font-mono text-[0.7rem] tracking-[0.18em] uppercase text-ink-500 mt-1">
+                    {t.role}
+                  </div>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <About />
+
+      {/* CTA */}
+      <section className="section-dark paper py-24 md:py-32">
+        <div className="max-w-[1320px] mx-auto px-6 lg:px-12">
+          <div className="grid grid-cols-12 gap-x-6 lg:gap-x-10 items-end">
+            <div className="col-span-12 lg:col-span-8 reveal-up">
+              <div className="kicker mb-6 text-clay-400">Next Step</div>
+              <h2 className="font-display text-[2.5rem] md:text-[4rem] lg:text-[5rem] font-light leading-[0.95] tracking-[-0.03em] text-ivory-50">
+                Begin the
+                <br />
+                <span className="italic text-clay-400">conversation</span>.
+              </h2>
+            </div>
+            <div className="col-span-12 lg:col-span-4 mt-10 lg:mt-0 flex flex-col gap-4 reveal-up">
+              <Magnetic strength={0.35}>
+                <Link href="/contact" className="btn-clay" data-cursor="label" data-cursor-text="Book →">Request a Session<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="miter" strokeWidth={1.5} d="M5 12h14M13 6l6 6-6 6" /></svg></Link>
+              </Magnetic>
+              <Magnetic strength={0.3}>
+                <Link href="/practitioners" className="btn-ghost border-ivory-100 text-ivory-100" data-cursor="label" data-cursor-text="Apply →">Apply as Practitioner<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="miter" strokeWidth={1.5} d="M5 12h14M13 6l6 6-6 6" /></svg></Link>
+              </Magnetic>
             </div>
           </div>
         </div>
       </section>
-    </>
+    </main>
   );
 }

@@ -1,181 +1,273 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
 interface Service {
-  icon: React.ReactNode;
+  number: string;
   title: string;
+  italic?: string;
+  duration: string;
+  format: string;
   description: string;
-  color: string;
+  detail: string;
 }
 
 const services: Service[] = [
   {
-    icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-      </svg>
-    ),
-    title: "Psychological Therapy",
-    description: "Professional therapy sessions to help you navigate life's challenges and improve mental wellbeing.",
-    color: "electric",
+    number: "I",
+    title: "Psychological",
+    italic: "Therapy",
+    duration: "50 min",
+    format: "In-person · Telehealth",
+    description:
+      "Talking work with a licensed psychologist. Cognitive-behavioural, psychodynamic, or integrative — chosen against the shape of the question, not against a brochure.",
+    detail: "Booked in series of six or twelve",
   },
   {
-    icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
-      </svg>
-    ),
-    title: "Counseling Services",
-    description: "Individual and group counseling tailored to your specific needs and goals.",
-    color: "neon",
+    number: "II",
+    title: "Clinical",
+    italic: "Counselling",
+    duration: "60 min",
+    format: "Individual · Couple · Family",
+    description:
+      "Counselling tailored to the relationship the session is meant to serve — whether that relationship is with another person, with one's work, or with oneself.",
+    detail: "Couples and family work available",
   },
   {
-    icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-      </svg>
-    ),
-    title: "Psychiatric Consultation",
-    description: "Expert psychiatric evaluations and medication management for mental health conditions.",
-    color: "violet",
+    number: "III",
+    title: "Psychiatric",
+    italic: "Consultation",
+    duration: "75 min initial",
+    format: "Assessment · Medication management",
+    description:
+      "A formal psychiatric evaluation with medication review when indicated. Continuity letters issued to GPs and physicians on request.",
+    detail: "Follow-ups at 25 minutes",
   },
   {
-    icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-      </svg>
-    ),
-    title: "Mental Health Assessment",
-    description: "Comprehensive assessments to understand your mental health needs and create treatment plans.",
-    color: "coral",
+    number: "IV",
+    title: "Mental Health",
+    italic: "Assessment",
+    duration: "2–3 sessions",
+    format: "Comprehensive",
+    description:
+      "Structured assessment producing a written formulation and a treatment plan you can carry between practitioners. The map before the journey.",
+    detail: "Delivered as a written report",
   },
   {
-    icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-      </svg>
-    ),
-    title: "Wellbeing Programs",
-    description: "Holistic programs designed to enhance your overall mental and emotional wellbeing.",
-    color: "neon",
+    number: "V",
+    title: "Wellbeing",
+    italic: "Programmes",
+    duration: "8–12 weeks",
+    format: "Group · Cohort",
+    description:
+      "Cohort programmes on stress, sleep, grief, and burnout — held by a senior clinician with no more than ten people in the room at a time.",
+    detail: "Limited to ten participants",
   },
   {
-    icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-      </svg>
-    ),
-    title: "Corporate Wellness",
-    description: "Workplace mental health programs to support employee wellbeing and productivity.",
-    color: "electric",
+    number: "VI",
+    title: "Corporate",
+    italic: "Wellness",
+    duration: "Bespoke",
+    format: "On-site · Hybrid",
+    description:
+      "Confidential, contracted support for organisations who would rather their people not become statistics. Reporting at the team level, never the individual.",
+    detail: "Confidentiality contracts standard",
   },
 ];
 
 export default function Services() {
   const sectionRef = useRef<HTMLElement>(null);
-  const headingRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLOListElement>(null);
+  const [hovered, setHovered] = useState<number | null>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Heading entrance
-      gsap.fromTo(headingRef.current?.children ?? [],
-        { y: 50, opacity: 0 },
-        {
-          y: 0, opacity: 1, duration: 0.8,
-          stagger: 0.15, ease: "power3.out",
-          scrollTrigger: { trigger: headingRef.current, start: "top 80%", once: true },
-        }
-      );
-
-      // Cards stagger
-      const cardEls = cardsRef.current?.children ? Array.from(cardsRef.current.children) : [];
-      cardEls.forEach((el, i) => {
-        gsap.fromTo(el,
-          { y: 60, opacity: 0, scale: 0.95 },
+      const reveals = sectionRef.current?.querySelectorAll(".reveal-up") ?? [];
+      reveals.forEach((el, i) => {
+        gsap.fromTo(
+          el,
+          { y: 32, opacity: 0 },
           {
-            y: 0, opacity: 1, scale: 1, duration: 0.7,
-            scrollTrigger: { trigger: el, start: "top 85%", once: true },
+            y: 0,
+            opacity: 1,
+            duration: 0.9,
             ease: "power3.out",
-            delay: i * 0.08,
+            delay: (i % 3) * 0.06,
+            scrollTrigger: { trigger: el, start: "top 85%", once: true },
           }
         );
       });
+
+      // Per-row hover GSAP — drives a fill bar + a number shift + title slide
+      const rows = listRef.current?.querySelectorAll<HTMLElement>(".service-row") ?? [];
+      const handlers: Array<() => void> = [];
+
+      rows.forEach((row) => {
+        const fill = row.querySelector(".service-fill");
+        const number = row.querySelector(".service-number");
+        const title = row.querySelector(".service-title");
+        const meta = row.querySelector(".service-meta");
+        const desc = row.querySelector(".service-desc");
+        const arrow = row.querySelector(".service-arrow");
+
+        gsap.set(fill, { scaleX: 0, transformOrigin: "left center" });
+
+        const enter = () => {
+          gsap.to(fill, { scaleX: 1, duration: 0.7, ease: "power3.out" });
+          gsap.to(number, { x: 8, color: "#B8512E", duration: 0.5, ease: "power3.out" });
+          gsap.to(title, { x: 12, duration: 0.55, ease: "power3.out" });
+          gsap.to(meta, { x: 12, duration: 0.55, ease: "power3.out", delay: 0.02 });
+          gsap.to(desc, { x: -8, opacity: 1, duration: 0.55, ease: "power3.out" });
+          gsap.to(arrow, { x: 0, opacity: 1, duration: 0.55, ease: "power3.out" });
+        };
+
+        const leave = () => {
+          gsap.to(fill, {
+            scaleX: 0,
+            duration: 0.55,
+            ease: "power3.in",
+            transformOrigin: "right center",
+            onComplete: () => gsap.set(fill, { transformOrigin: "left center" }),
+          });
+          gsap.to(number, { x: 0, color: "#B8512E", duration: 0.55, ease: "power3.out" });
+          gsap.to(title, { x: 0, duration: 0.55, ease: "power3.out" });
+          gsap.to(meta, { x: 0, duration: 0.55, ease: "power3.out" });
+          gsap.to(desc, { x: 0, opacity: 1, duration: 0.55, ease: "power3.out" });
+          gsap.to(arrow, { x: -8, opacity: 0, duration: 0.4, ease: "power3.out" });
+        };
+
+        row.addEventListener("pointerenter", enter);
+        row.addEventListener("pointerleave", leave);
+        handlers.push(() => {
+          row.removeEventListener("pointerenter", enter);
+          row.removeEventListener("pointerleave", leave);
+        });
+      });
+
+      return () => handlers.forEach((fn) => fn());
     }, sectionRef);
 
     return () => ctx.revert();
   }, []);
 
-  const colorClasses: Record<string, { bg: string; border: string; text: string; icon: string }> = {
-    electric: { bg: "bg-electric-50", border: "border-electric-500", text: "text-electric-700", icon: "bg-electric-500" },
-    neon: { bg: "bg-neon-50", border: "border-neon-500", text: "text-neon-700", icon: "bg-neon-500" },
-    violet: { bg: "bg-violet-50", border: "border-violet-500", text: "text-violet-700", icon: "bg-violet-500" },
-    coral: { bg: "bg-coral-50", border: "border-coral-500", text: "text-coral-700", icon: "bg-coral-500" },
-  };
-
   return (
-    <section ref={sectionRef} className="py-32 bg-slate-50 relative overflow-hidden">
-      {/* Background elements */}
-      <div className="absolute inset-0 grid-pattern-dense opacity-30" />
-      <div className="absolute top-20 right-10 w-72 h-72 bg-electric-500/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-20 left-10 w-80 h-80 bg-neon-500/5 rounded-full blur-3xl" />
-
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <div ref={headingRef} className="text-center mb-20">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-900 rounded-full mb-6 shadow-sharp">
-            <span className="text-sm font-bold text-slate-900 uppercase tracking-wider">Our Services</span>
+    <section
+      ref={sectionRef}
+      className="relative paper bg-ivory-50 py-28 md:py-36"
+    >
+      <div className="max-w-[1320px] mx-auto px-6 lg:px-12">
+        <div className="grid grid-cols-12 gap-x-6 lg:gap-x-10 mb-20 md:mb-24 items-end">
+          <div className="col-span-12 lg:col-span-7 reveal-up">
+            <div className="kicker mb-6">The Practice</div>
+            <h2 className="font-display text-[3rem] md:text-[4.5rem] lg:text-[6rem] font-light text-ink-900 leading-[0.92] tracking-[-0.03em]">
+              Six rooms,
+              <br />
+              <span className="italic text-clay-600">six conversations.</span>
+            </h2>
           </div>
-          <h2 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold text-slate-900 mb-6 leading-tight">
-            Comprehensive<br />
-            <span className="text-electric-500">Mental Health</span> Care
-          </h2>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto font-medium">
-            We offer a wide range of mental health services provided by experienced practitioners dedicated to your wellbeing.
-          </p>
+          <div className="col-span-12 lg:col-span-4 lg:col-start-9 lg:pl-6 lg:border-l lg:border-ink-200 reveal-up mt-8 lg:mt-0">
+            <p className="text-[0.95rem] leading-[1.75] text-ink-700 font-light max-w-[34ch]">
+              Each service is held by a senior practitioner against a written
+              standard. No referrals you cannot trace. No session that fits a
+              category instead of a person.
+            </p>
+          </div>
         </div>
 
-        <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map((service, i) => {
-            const colors = colorClasses[service.color];
-            return (
+        <ol ref={listRef} className="border-t border-ink-900">
+          {services.map((s, i) => (
+            <li
+              key={s.number}
+              className="reveal-up border-b border-ink-900 group cursor-pointer"
+              onMouseEnter={() => setHovered(i)}
+              onMouseLeave={() => setHovered(null)}
+            >
               <div
-                key={service.title}
-                className={`group relative bg-white p-8 rounded-2xl border-2 border-slate-200 hover:border-slate-900 hover-lift transition-all duration-300 overflow-hidden`}
+                className="service-row relative grid grid-cols-12 gap-x-4 lg:gap-x-8 py-8 md:py-10 items-start"
+                data-cursor="label"
+                data-cursor-text="Read →"
               >
-                {/* Hover background */}
-                <div className={`absolute inset-0 ${colors.bg} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                {/* Hover fill (radial-edge clay) */}
+                <span
+                  aria-hidden
+                  className="service-fill absolute inset-0 bg-clay-100/60 -z-0"
+                />
 
-                {/* Corner accent */}
-                <div className={`absolute top-0 right-0 w-20 h-20 ${colors.icon} opacity-5 rounded-bl-full`} />
+                {/* Number */}
+                <div className="col-span-2 md:col-span-1 relative z-10">
+                  <span className="service-number inline-block font-mono text-[0.78rem] tracking-[0.22em] uppercase text-clay-600 tabular-nums">
+                    №&nbsp;{s.number}
+                  </span>
+                </div>
 
-                <div className="relative z-10">
-                  {/* Icon */}
-                  <div className={`w-14 h-14 ${colors.icon} text-white rounded-xl flex items-center justify-center mb-6 shadow-sharp group-hover:shadow-sharp-lg group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
-                    {service.icon}
-                  </div>
-
-                  <h3 className="text-xl font-bold text-slate-900 mb-3">{service.title}</h3>
-                  <p className="text-slate-600 leading-relaxed mb-4">{service.description}</p>
-
-                  {/* Learn more link */}
-                  <div className={`flex items-center gap-2 ${colors.text} font-bold text-sm opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300`}>
-                    Learn more
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
+                {/* Title */}
+                <div className="col-span-10 md:col-span-5 lg:col-span-4 relative z-10">
+                  <h3 className="service-title font-display text-[1.85rem] md:text-[2.4rem] lg:text-[2.85rem] font-light leading-[1] tracking-[-0.02em] text-ink-900">
+                    {s.title}{" "}
+                    <span className="italic text-clay-600">{s.italic}</span>
+                  </h3>
+                  <div className="service-meta mt-3 flex flex-wrap gap-x-4 gap-y-1">
+                    <span className="font-mono text-[0.7rem] tracking-[0.22em] uppercase text-ink-500">
+                      {s.duration}
+                    </span>
+                    <span className="font-mono text-[0.7rem] tracking-[0.22em] uppercase text-ink-500">
+                      · {s.format}
+                    </span>
                   </div>
                 </div>
 
-                {/* Bottom accent line */}
-                <div className={`absolute bottom-0 left-0 right-0 h-1 ${colors.icon} scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left`} />
+                {/* Description */}
+                <div className="hidden md:block col-span-5 lg:col-span-5 relative z-10">
+                  <p className="service-desc text-[0.95rem] leading-[1.65] text-ink-700 font-light max-w-[44ch]">
+                    {s.description}
+                  </p>
+                </div>
+
+                {/* Arrow */}
+                <div className="hidden lg:flex col-span-2 justify-end items-center pt-2 relative z-10">
+                  <span
+                    className={`service-arrow flex items-center gap-3 text-[0.75rem] tracking-[0.18em] uppercase font-medium text-clay-600 opacity-0 -translate-x-2`}
+                  >
+                    Read
+                    <svg
+                      className={`w-4 h-4 transition-transform duration-500 ${
+                        hovered === i ? "translate-x-1" : ""
+                      }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="miter"
+                        strokeWidth={1.5}
+                        d="M5 12h14M13 6l6 6-6 6"
+                      />
+                    </svg>
+                  </span>
+                </div>
               </div>
-            );
-          })}
+
+              <div className="md:hidden col-span-12 px-0 pb-6">
+                <p className="text-[0.9rem] leading-[1.65] text-ink-700 font-light pl-[calc(2/12*100%)]">
+                  {s.description}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        <div className="reveal-up mt-12 flex items-start gap-4 max-w-[60ch]">
+          <span className="folio mt-1 shrink-0">NOTE</span>
+          <p className="text-[0.85rem] leading-[1.7] text-ink-600 font-light">
+            All services are held under HIPAA-aligned privacy protocols. Sliding-scale
+            and pro-bono hours are reserved each month — request through the contact
+            form and our intake team will respond within two working days.
+          </p>
         </div>
       </div>
     </section>

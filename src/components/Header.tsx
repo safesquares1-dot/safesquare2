@@ -2,26 +2,33 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import gsap from "gsap";
+
+const ISSUE_LABEL = "VOL. XII / KARACHI EDITION";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const navRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 30);
+    const handleScroll = () => setIsScrolled(window.scrollY > 16);
     window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
 
     const ctx = gsap.context(() => {
-      gsap.fromTo(headerRef.current,
-        { y: -80, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }
+      gsap.fromTo(
+        headerRef.current,
+        { y: -28, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.9, ease: "power3.out" }
       );
-      gsap.fromTo(navRef.current?.children ?? [],
-        { y: -20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.5, stagger: 0.05, ease: "power2.out", delay: 0.3 }
+      gsap.fromTo(
+        navRef.current?.children ?? [],
+        { y: -8, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5, stagger: 0.05, ease: "power2.out", delay: 0.35 }
       );
     }, headerRef);
 
@@ -31,106 +38,169 @@ export default function Header() {
     };
   }, []);
 
+  const closeMobile = () => setIsMobileMenuOpen(false);
+
   const navLinks = [
-    { href: "/", label: "Home" },
-    { href: "/about", label: "About" },
-    { href: "/services", label: "Services" },
-    { href: "/practitioners", label: "Practitioners" },
-    { href: "/contact", label: "Contact" },
+    { href: "/", label: "Index", number: "01" },
+    { href: "/about", label: "About", number: "02" },
+    { href: "/services", label: "Practice", number: "03" },
+    { href: "/practitioners", label: "Practitioners", number: "04" },
+    { href: "/contact", label: "Visit", number: "05" },
   ];
 
   return (
     <header
       ref={headerRef}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-500 ${
         isScrolled
-          ? "bg-white/95 backdrop-blur-xl shadow-lg border-b-2 border-slate-100"
-          : "bg-transparent"
+          ? "bg-ivory-100/92 backdrop-blur-md border-b border-ink-900"
+          : "bg-ivory-100 border-b border-ink-900"
       }`}
     >
-      <nav className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-electric-500 to-violet-600 rounded-lg flex items-center justify-center shadow-sharp group-hover:shadow-sharp-lg transition-all duration-300 group-hover:rotate-6">
-              <span className="text-white font-bold text-xl">S</span>
-            </div>
-            <span className="text-2xl font-bold font-display text-slate-900">
-              Safe<span className="text-electric-500">square</span>
+      {/* Top rule — date + edition */}
+      <div className="border-b border-ink-200">
+        <div className="max-w-[1320px] mx-auto px-6 lg:px-12 flex items-center justify-between h-7">
+          <span className="folio">{ISSUE_LABEL}</span>
+          <span className="folio hidden sm:inline">
+            EST. 2012 · CLIFTON · BLOCK 4
+          </span>
+          <span className="folio">+92 300 1437360</span>
+        </div>
+      </div>
+
+      <nav className="max-w-[1320px] mx-auto px-6 lg:px-12">
+        <div className="flex items-center justify-between h-[60px]">
+          {/* Wordmark */}
+          <Link href="/" className="group flex items-baseline gap-2">
+            <span className="font-display italic font-light text-[2rem] leading-none tracking-[-0.04em] text-ink-900">
+              Safesquare
             </span>
+            <span className="hidden md:inline-block w-1.5 h-1.5 rounded-full bg-clay-600 mb-1 group-hover:bg-ink-900 transition-colors duration-400" />
           </Link>
 
           {/* Desktop nav */}
-          <div ref={navRef} className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="relative px-4 py-2 text-sm font-bold text-slate-700 hover:text-electric-600 transition-colors group"
-              >
-                {link.label}
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-electric-500 group-hover:w-3/4 transition-all duration-300" />
-              </Link>
-            ))}
+          <div ref={navRef} className="hidden lg:flex items-center gap-9">
+            {navLinks.map((link) => {
+              const active =
+                link.href === "/"
+                  ? pathname === "/"
+                  : pathname.startsWith(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="group relative flex items-baseline gap-1.5 py-1.5"
+                >
+                  <span className="font-mono text-[0.625rem] text-ink-400 tracking-[0.2em] tabular-nums">
+                    {link.number}
+                  </span>
+                  <span
+                    className={`text-[0.875rem] tracking-tight transition-colors duration-300 ${
+                      active ? "text-clay-600" : "text-ink-900 group-hover:text-clay-600"
+                    }`}
+                  >
+                    {link.label}
+                  </span>
+                  <span
+                    className={`absolute left-0 -bottom-0.5 h-px bg-clay-600 transition-all duration-500 ease-out ${
+                      active ? "w-full" : "w-0 group-hover:w-full"
+                    }`}
+                  />
+                </Link>
+              );
+            })}
           </div>
 
-          {/* CTA button */}
-          <div className="hidden md:flex items-center">
-            <Link
-              href="/contact"
-              className="relative px-6 py-2.5 bg-slate-900 text-white font-bold text-sm rounded-lg overflow-hidden group shadow-sharp hover:shadow-sharp-lg transition-all duration-300 hover:-translate-y-0.5"
-            >
-              <span className="relative z-10 flex items-center gap-2">
-                Book Now
-                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          {/* CTA */}
+          <div className="hidden lg:flex items-center gap-3">
+            <Link href="/contact" className="btn-ink py-3 px-5 text-[0.6875rem]">
+              <span className="flex items-center gap-2.5">
+                Request a Session
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="miter" strokeWidth={1.5} d="M5 12h14M13 6l6 6-6 6" />
                 </svg>
               </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-electric-600 to-violet-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </Link>
           </div>
 
-          {/* Mobile menu toggle */}
+          {/* Mobile toggle */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden relative w-10 h-10 flex flex-col items-center justify-center gap-1.5 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+            className="lg:hidden relative w-10 h-10 flex flex-col items-center justify-center gap-1.5"
             aria-label="Toggle menu"
+            aria-expanded={isMobileMenuOpen}
           >
-            <span className={`block w-5 h-0.5 bg-slate-900 rounded-full transition-all duration-300 ${isMobileMenuOpen ? "rotate-45 translate-y-2" : ""}`} />
-            <span className={`block w-5 h-0.5 bg-slate-900 rounded-full transition-all duration-300 ${isMobileMenuOpen ? "opacity-0 scale-x-0" : ""}`} />
-            <span className={`block w-5 h-0.5 bg-slate-900 rounded-full transition-all duration-300 ${isMobileMenuOpen ? "-rotate-45 -translate-y-2" : ""}`} />
+            <span
+              className={`block w-6 h-px bg-ink-900 transition-all duration-400 ${
+                isMobileMenuOpen ? "rotate-45 translate-y-[3.5px]" : ""
+              }`}
+            />
+            <span
+              className={`block w-6 h-px bg-ink-900 transition-all duration-400 ${
+                isMobileMenuOpen ? "opacity-0 scale-x-0" : ""
+              }`}
+            />
+            <span
+              className={`block w-6 h-px bg-ink-900 transition-all duration-400 ${
+                isMobileMenuOpen ? "-rotate-45 -translate-y-[3.5px]" : ""
+              }`}
+            />
           </button>
         </div>
       </nav>
 
       {/* Mobile menu */}
-      <div className={`md:hidden bg-white border-t-2 border-slate-100 transition-all duration-300 ${isMobileMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"} overflow-hidden`}>
-        <div className="px-4 py-6 space-y-2">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="flex items-center justify-between px-4 py-3 text-base font-bold text-slate-700 hover:text-electric-600 hover:bg-electric-50 rounded-lg transition-all group"
-            >
-              {link.label}
-              <svg className="w-4 h-4 text-electric-500 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
-          ))}
-          <div className="pt-4">
-            <Link
-              href="/contact"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-slate-900 text-white font-bold rounded-lg hover:bg-slate-800 transition-colors shadow-sharp"
-            >
-              Book Now
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </Link>
-          </div>
+      <div
+        className={`lg:hidden bg-ivory-100 border-t border-ink-900 overflow-hidden transition-[max-height,opacity] duration-500 ease-[var(--ease-editorial)] ${
+          isMobileMenuOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
+        <div className="px-6 py-8">
+          <div className="kicker mb-6">Contents</div>
+          <ul className="divide-y divide-ink-200 border-t border-b border-ink-200 mb-8">
+            {navLinks.map((link) => {
+              const active =
+                link.href === "/"
+                  ? pathname === "/"
+                  : pathname.startsWith(link.href);
+              return (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    onClick={closeMobile}
+                    className="group flex items-center justify-between py-4"
+                  >
+                    <span className="flex items-baseline gap-3">
+                      <span className="font-mono text-[0.625rem] text-ink-400 tracking-[0.2em] tabular-nums">
+                        {link.number}
+                      </span>
+                      <span
+                        className={`font-display italic font-light text-[1.75rem] leading-none ${
+                          active ? "text-clay-600" : "text-ink-900"
+                        }`}
+                      >
+                        {link.label}
+                      </span>
+                    </span>
+                    <svg
+                      className="w-4 h-4 text-ink-900 group-hover:text-clay-600 group-hover:translate-x-1 transition-all duration-300"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="miter" strokeWidth={1.5} d="M5 12h14M13 6l6 6-6 6" />
+                    </svg>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+          <Link href="/contact" onClick={closeMobile} className="btn-clay w-full py-4">
+            Request a Session
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="miter" strokeWidth={1.5} d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </Link>
         </div>
       </div>
     </header>
